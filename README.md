@@ -1,2 +1,2 @@
 # api-gateway
-User Service is a microservice responsible for managing users within the application ecosystem.
+API gateway is a microservice responsible for managing microservices within the application ecosystem.
