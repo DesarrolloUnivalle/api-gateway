@@ -1,0 +1,67 @@
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      mvc:
+        routes:
+          - id: usuarios-service
+            uri: lb://usuarios-service
+            predicates:
+              - Path=/usuarios/**,/auth/**
+          - id: ordenes-service
+            uri: lb://ordenes-service
+            predicates:
+              - Path=/api/ordenes/**
+          - id: productos-service
+            uri: lb://productos-service
+            predicates:
+              - Path=/api/productos/**,/categorias/**
+          - id: entregas-service
+            uri: lb://entregas-service
+            predicates:
+              - Path=/api/entregas/**
+  zipkin:
+    enabled: true
+    base-url: http://zipkin:9411
+  sleuth:
+    enabled: false
+
+server:
+  port: 9000
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka/
+    fetch-registry: true
+    register-with-eureka: true
+    webclient:
+      enabled: true
+  instance:
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+    prefer-ip-address: true
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    root: INFO
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator: DEBUG
+    org.springframework.cloud.gateway.filter: DEBUG
+    org.springframework.web.reactive: DEBUG
+    reactor.netty: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    level: "%5p [${spring.application.name}, %X{traceId:-},%X{spanId:-}]" 
